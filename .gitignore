@@ -1,0 +1,13 @@
+# Python (archivos temporales)
+__pycache__/
+*.pyc
+.venv/
+
+
+# Secretos locales
+.env
+
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
