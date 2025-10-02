@@ -5,7 +5,7 @@ from typing import List, Optional
 from db import Base, engine, get_db
 from sqlalchemy.orm import Session
 from schemas import EventIn, HeartbeatIn, MetricsOut
-from crud import insert_events, metrics_last_minutes, recent_events,
+from crud import insert_events, metrics_last_minutes, recent_events, upsert_heartbeat
 upsert_heartbeat
 from auth import require_token
 Base.metadata.create_all(bind=engine)
