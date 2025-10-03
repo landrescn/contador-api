@@ -1,19 +1,23 @@
-# auth.py
-import os, time
-from jose import jwt, JWTError
-from fastapi import HTTPException, status, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-JWT_SECRET = os.getenv("JWT_SECRET", "change")
-JWT_ALG = os.getenv("JWT_ALG", "HS256")
-security = HTTPBearer()
-def create_token(sub: str, role: str = "viewer", exp_sec: int = 3600):
-payload = {"sub": sub, "role": role, "exp": int(time.time()) + exp_sec}
-return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALG)
-def require_token(creds: HTTPAuthorizationCredentials = Depends(security)):
-try:
-payload = jwt.decode(creds.credentials, JWT_SECRET,
-algorithms=[JWT_ALG])
-return payload
-except JWTError:
-raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-detail="Invalid token")
+import os
+from fastapi import Header, HTTPException, status
+
+API_TOKEN = os.getenv("API_TOKEN")
+
+
+def require_token(authorization: str | None = Header(default=None)):
+    # Si no hay token configurado en el entorno, dejamos pasar (útil para pruebas)
+    if not API_TOKEN:
+        return {}
+
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token"
+        )
+
+    token = authorization.split(" ", 1)[1]
+    if token != API_TOKEN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token"
+        )
+
+    return {}
